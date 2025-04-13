@@ -93,7 +93,6 @@ class ComputationService(private val jobRepository: JobRepository) : LoggingAwar
      * Generates results for a calculation.
      *
      * @param jobId The ID of the job
-     * @param inputItems The list of input items
      * @return A list of result strings
      */
     private fun generateResults(jobId: String): List<String> {
