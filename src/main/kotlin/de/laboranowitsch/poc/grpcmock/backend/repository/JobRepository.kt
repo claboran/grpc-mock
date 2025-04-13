@@ -1,7 +1,8 @@
 package de.laboranowitsch.poc.grpcmock.backend.repository
 
+import de.laboranowitsch.poc.grpcmock.logging.LoggingAware
+import de.laboranowitsch.poc.grpcmock.logging.logger
 import de.laboranowitsch.poc.grpcmock.protobuf.CalculationStatus.Status as GrpcStatus
-import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Repository
 import java.util.concurrent.ConcurrentHashMap
 
@@ -10,9 +11,9 @@ import java.util.concurrent.ConcurrentHashMap
  * This class handles the persistence of job statuses, results, and inputs.
  */
 @Repository
-class JobRepository {
+class JobRepository : LoggingAware {
 
-    private val logger = LoggerFactory.getLogger(javaClass)
+    private val logger = logger()
 
     // --- Mock Data Storage (In-memory for POC) ---
     private val jobStatuses = ConcurrentHashMap<String, GrpcStatus>()

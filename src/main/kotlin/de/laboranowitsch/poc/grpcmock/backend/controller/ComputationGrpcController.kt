@@ -1,12 +1,13 @@
 package de.laboranowitsch.poc.grpcmock.backend.controller
 
 import de.laboranowitsch.poc.grpcmock.backend.service.ComputationService
+import de.laboranowitsch.poc.grpcmock.logging.LoggingAware
+import de.laboranowitsch.poc.grpcmock.logging.logger
 import de.laboranowitsch.poc.grpcmock.protobuf.*
 import de.laboranowitsch.poc.grpcmock.protobuf.CalculationStatus.Status as GrpcStatus
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import net.devh.boot.grpc.server.service.GrpcService
-import org.slf4j.LoggerFactory
 
 /**
  * gRPC controller for the computation service.
@@ -14,9 +15,9 @@ import org.slf4j.LoggerFactory
  */
 @GrpcService
 class ComputationGrpcController(private val computationService: ComputationService) : 
-    ComputationServiceGrpcKt.ComputationServiceCoroutineImplBase() {
+    ComputationServiceGrpcKt.ComputationServiceCoroutineImplBase(), LoggingAware {
 
-    private val logger = LoggerFactory.getLogger(javaClass)
+    private val logger = logger()
 
     /**
      * Processes a calculation request and returns a flow of responses.
@@ -28,7 +29,7 @@ class ComputationGrpcController(private val computationService: ComputationServi
         val jobId = request.jobId
         val inputItems = request.inputItemsList ?: listOf()
 
-        logger.info("[{}] Received ProcessCalculation request with {} items.", jobId, inputItems.size)
+        logger.info("[$jobId] Received ProcessCalculation request with {} items.", inputItems.size)
 
         // Validate request
         val validationResult = computationService.validateRequest(jobId, inputItems)
@@ -47,7 +48,7 @@ class ComputationGrpcController(private val computationService: ComputationServi
         return computationService.processCalculation(jobId, inputItems)
             .catch { e ->
                 // Catch exceptions during flow emission
-                logger.error("Error emitting response flow: ", e)
+                logger.error("Error emitting response flow", e)
             }
     }
 }

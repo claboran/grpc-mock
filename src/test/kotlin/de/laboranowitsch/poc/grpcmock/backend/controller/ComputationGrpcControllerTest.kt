@@ -1,6 +1,8 @@
 package de.laboranowitsch.poc.grpcmock.backend.controller
 
 import de.laboranowitsch.poc.grpcmock.backend.service.ComputationService
+import de.laboranowitsch.poc.grpcmock.logging.LoggingAware
+import de.laboranowitsch.poc.grpcmock.logging.logger
 import de.laboranowitsch.poc.grpcmock.protobuf.*
 import de.laboranowitsch.poc.grpcmock.protobuf.CalculationStatus.Status as GrpcStatus
 import kotlinx.coroutines.flow.flowOf
@@ -18,7 +20,9 @@ import org.mockito.junit.jupiter.MockitoExtension
  * Unit tests for the ComputationGrpcController class.
  */
 @ExtendWith(MockitoExtension::class)
-class ComputationGrpcControllerTest {
+class ComputationGrpcControllerTest : LoggingAware {
+
+    private val logger = logger()
 
     @Mock
     private lateinit var computationService: ComputationService
@@ -31,7 +35,7 @@ class ComputationGrpcControllerTest {
     }
 
     @Test
-    fun processCalculationShouldDelegateToServiceForValidRequest() {
+    fun `should delegate to service for valid request`() {
         // Given
         val jobId = "test-job"
         val inputItems = listOf(
@@ -73,7 +77,7 @@ class ComputationGrpcControllerTest {
     }
 
     @Test
-    fun processCalculationShouldReturnErrorResponseForInvalidRequest() {
+    fun `should return error response for invalid request`() {
         // Given
         val jobId = ""
         val inputItems = listOf(
@@ -118,7 +122,7 @@ class ComputationGrpcControllerTest {
     }
 
     @Test
-    fun processCalculationShouldHandleTooManyInputItems() {
+    fun `should handle too many input items`() {
         // Given
         val jobId = "test-job"
         val inputItems = List(1001) { 

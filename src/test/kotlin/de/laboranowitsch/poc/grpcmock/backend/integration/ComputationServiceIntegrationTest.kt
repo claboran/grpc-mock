@@ -1,6 +1,8 @@
 package de.laboranowitsch.poc.grpcmock.backend.integration
 
 import de.laboranowitsch.poc.grpcmock.GrpcMockApplication
+import de.laboranowitsch.poc.grpcmock.logging.LoggingAware
+import de.laboranowitsch.poc.grpcmock.logging.logger
 import de.laboranowitsch.poc.grpcmock.protobuf.*
 import de.laboranowitsch.poc.grpcmock.protobuf.CalculationStatus.Status as GrpcStatus
 import io.grpc.testing.GrpcCleanupRule
@@ -37,7 +39,9 @@ import org.springframework.test.annotation.DirtiesContext
     GrpcClientAutoConfiguration::class // Auto-configure client for testing
 )
 @DirtiesContext // Fresh context per test class
-class ComputationServiceIntegrationTest {
+class ComputationServiceIntegrationTest : LoggingAware {
+
+    private val logger = logger()
 
     @get:Rule
     val grpcCleanup = GrpcCleanupRule() // Manages server/channel lifecycle
@@ -65,19 +69,19 @@ class ComputationServiceIntegrationTest {
         // Collect the response stream
         val collectionJob = launch {
             clientStub.processCalculation(request).collect { response ->
-                println("Test received: ${response.responseTypeCase}")
+                logger.info("Test received: {}", response.responseTypeCase)
                 responses.add(response)
                 when (response.responseTypeCase) {
                     CalculationResponse.ResponseTypeCase.STATUS_UPDATE -> {
                         finalStatus = response.statusUpdate.status
-                        println(" -> Status: ${response.statusUpdate.status}")
+                        logger.info(" -> Status: {}", response.statusUpdate.status)
                     }
                     CalculationResponse.ResponseTypeCase.OUTPUT_CHUNK -> {
                         receivedChunks++
                         response.outputChunk.itemsList.forEach { receivedOutputItems.add(it) }
-                        println(" -> Chunk Items: ${response.outputChunk.itemsList.size}")
+                        logger.info(" -> Chunk Items: {}", response.outputChunk.itemsList.size)
                     }
-                    else -> println(" -> Unknown response type")
+                    else -> logger.info(" -> Unknown response type")
                 }
             }
         }
@@ -119,11 +123,11 @@ class ComputationServiceIntegrationTest {
         // Collect the response stream
         val collectionJob = launch {
             clientStub.processCalculation(request).collect { response ->
-                println("Test received: ${response.responseTypeCase}")
+                logger.info("Test received: {}", response.responseTypeCase)
                 responses.add(response)
                 if (response.responseTypeCase == CalculationResponse.ResponseTypeCase.STATUS_UPDATE) {
                     finalStatus = response.statusUpdate.status
-                    println(" -> Status: ${response.statusUpdate.status}")
+                    logger.info(" -> Status: {}", response.statusUpdate.status)
                 }
             }
         }
@@ -162,11 +166,11 @@ class ComputationServiceIntegrationTest {
         // Collect the response stream
         val collectionJob = launch {
             clientStub.processCalculation(request).collect { response ->
-                println("Test received: ${response.responseTypeCase}")
+                logger.info("Test received: {}", response.responseTypeCase)
                 responses.add(response)
                 if (response.responseTypeCase == CalculationResponse.ResponseTypeCase.STATUS_UPDATE) {
                     finalStatus = response.statusUpdate.status
-                    println(" -> Status: ${response.statusUpdate.status}")
+                    logger.info(" -> Status: {}", response.statusUpdate.status)
                 }
             }
         }
@@ -201,11 +205,11 @@ class ComputationServiceIntegrationTest {
         // Collect the response stream
         val collectionJob = launch {
             clientStub.processCalculation(request).collect { response ->
-                println("Test received: ${response.responseTypeCase}")
+                logger.info("Test received: {}", response.responseTypeCase)
                 responses.add(response)
                 if (response.responseTypeCase == CalculationResponse.ResponseTypeCase.STATUS_UPDATE) {
                     finalStatus = response.statusUpdate.status
-                    println(" -> Status: ${response.statusUpdate.status}")
+                    logger.info(" -> Status: {}", response.statusUpdate.status)
                 }
             }
         }

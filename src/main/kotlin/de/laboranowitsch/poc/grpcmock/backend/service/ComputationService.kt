@@ -1,12 +1,13 @@
 package de.laboranowitsch.poc.grpcmock.backend.service
 
 import de.laboranowitsch.poc.grpcmock.backend.repository.JobRepository
+import de.laboranowitsch.poc.grpcmock.logging.LoggingAware
+import de.laboranowitsch.poc.grpcmock.logging.logger
 import de.laboranowitsch.poc.grpcmock.protobuf.*
 import de.laboranowitsch.poc.grpcmock.protobuf.CalculationStatus.Status as GrpcStatus
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
-import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
@@ -17,9 +18,9 @@ import kotlin.time.Duration.Companion.seconds
  * processing calculations, and generating responses.
  */
 @Service
-class ComputationService(private val jobRepository: JobRepository) {
+class ComputationService(private val jobRepository: JobRepository) : LoggingAware {
 
-    private val logger = LoggerFactory.getLogger(javaClass)
+    private val logger = logger()
 
     /**
      * Validates a calculation request.
@@ -56,7 +57,7 @@ class ComputationService(private val jobRepository: JobRepository) {
         jobRepository.updateJobStatus(jobId, GrpcStatus.ACCEPTED)
         jobRepository.clearJobResults(jobId)
         jobRepository.storeJobInputs(jobId, inputItems.map { it.value })
-        
+
         // Emit ACCEPTED status
         emit(createStatusResponse(jobId, GrpcStatus.ACCEPTED))
 
