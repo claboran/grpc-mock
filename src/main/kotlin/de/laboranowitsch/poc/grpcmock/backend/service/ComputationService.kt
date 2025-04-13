@@ -71,7 +71,7 @@ class ComputationService(private val jobRepository: JobRepository) : LoggingAwar
             delay(2.seconds + (inputItems.size * 5L).milliseconds)
 
             // Generate results
-            val results = generateResults(jobId, inputItems)
+            val results = generateResults(jobId)
             jobRepository.storeJobResults(jobId, results)
             logger.info("[{}] Calculation finished. Stored {} results.", jobId, results.size)
 
@@ -96,7 +96,7 @@ class ComputationService(private val jobRepository: JobRepository) : LoggingAwar
      * @param inputItems The list of input items
      * @return A list of result strings
      */
-    private fun generateResults(jobId: String, inputItems: List<InputParamItem>): List<String> {
+    private fun generateResults(jobId: String): List<String> {
         return jobRepository.getJobInputs(jobId)?.mapIndexed { index, input -> 
             "Processed: '${input}' (#${index + 1})" 
         } ?: listOf()

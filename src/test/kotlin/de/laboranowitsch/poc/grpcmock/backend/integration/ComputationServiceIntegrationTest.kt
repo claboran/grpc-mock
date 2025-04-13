@@ -111,7 +111,7 @@ class ComputationServiceIntegrationTest : LoggingAware {
     @Test
     fun `should handle empty input list`() = runBlocking {
         val jobId = "test-empty-input-${System.currentTimeMillis()}"
-        val inputItemsProto = listOf<InputParamItem>()
+        listOf<InputParamItem>()
 
         val request = CalculationRequest.newBuilder()
             .setJobId(jobId)
