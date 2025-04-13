@@ -20,7 +20,13 @@ src/
 ├── main/
 │   ├── kotlin/de/laboranowitsch/poc/grpcmock/
 │   │   ├── backend/                  # Service implementations
-│   │   │   └── ComputationServiceMock.kt
+│   │   │   ├── controller/           # gRPC controllers
+│   │   │   │   └── ComputationGrpcController.kt
+│   │   │   ├── repository/           # Data repositories
+│   │   │   │   └── JobRepository.kt
+│   │   │   ├── service/              # Business logic services
+│   │   │   │   └── ComputationService.kt
+│   │   │   └── ComputationServiceMock.kt  # Legacy implementation (delegates to new components)
 │   │   └── GrpcMockApplication.kt    # Main application entry point
 │   ├── proto/                        # Protocol Buffer definitions
 │   │   └── calculation.proto
@@ -29,7 +35,15 @@ src/
 └── test/
     └── kotlin/de/laboranowitsch/poc/grpcmock/
         └── backend/                  # Service tests
-            └── ComputationServiceMockTest.kt
+            ├── controller/           # Controller tests
+            │   └── ComputationGrpcControllerTest.kt
+            ├── repository/           # Repository tests
+            │   └── JobRepositoryTest.kt
+            ├── service/              # Service tests
+            │   └── ComputationServiceTest.kt
+            ├── integration/          # Integration tests
+            │   └── ComputationServiceIntegrationTest.kt
+            └── ComputationServiceMockTest.kt  # Legacy integration test
 ```
 
 ## Development Workflow
