@@ -88,12 +88,12 @@ protobuf {
 sourceSets {
     main {
         proto {
-            srcDirs 'src/main/proto' // Location of your .proto files
+            srcDir "src/main/proto" // Location of your .proto files
         }
         kotlin {
             // Include generated Kotlin code
-            srcDirs 'build/generated/source/proto/main/kotlin'
-            srcDirs 'build/generated/source/proto/main/grpckt'
+            srcDir "build/generated/source/proto/main/kotlin"
+            srcDir "build/generated/source/proto/main/grpckt"
         }
 //        java {
 //            // Include generated Java code (gRPC base classes)

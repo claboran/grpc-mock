@@ -2,27 +2,26 @@ package de.laboranowitsch.poc.grpcmock.backend.controller
 
 import de.laboranowitsch.poc.grpcmock.backend.service.ComputationService
 import de.laboranowitsch.poc.grpcmock.logging.LoggingAware
-import de.laboranowitsch.poc.grpcmock.logging.logger
-import de.laboranowitsch.poc.grpcmock.protobuf.*
-import de.laboranowitsch.poc.grpcmock.protobuf.CalculationStatus.Status as GrpcStatus
+import de.laboranowitsch.poc.grpcmock.protobuf.CalculationRequest
+import de.laboranowitsch.poc.grpcmock.protobuf.CalculationResponse
+import de.laboranowitsch.poc.grpcmock.protobuf.CalculationStatus
+import de.laboranowitsch.poc.grpcmock.protobuf.InputParamItem
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.toList
-import kotlinx.coroutines.runBlocking
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.Mock
 import org.mockito.Mockito
 import org.mockito.junit.jupiter.MockitoExtension
+import de.laboranowitsch.poc.grpcmock.protobuf.CalculationStatus.Status as GrpcStatus
 
 /**
  * Unit tests for the ComputationGrpcController class.
  */
 @ExtendWith(MockitoExtension::class)
 class ComputationGrpcControllerTest : LoggingAware {
-
-    private val logger = logger()
 
     @Mock
     private lateinit var computationService: ComputationService
