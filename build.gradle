@@ -1,0 +1,133 @@
+plugins {
+    id 'org.jetbrains.kotlin.jvm' version '1.9.25'
+    id 'org.jetbrains.kotlin.plugin.spring' version '1.9.25'
+    id 'org.springframework.boot' version '3.4.4'
+    id 'io.spring.dependency-management' version '1.1.7'
+    id 'com.google.protobuf' version '0.9.4'
+}
+
+group = 'de.laboranowitsch.poc'
+version = '0.0.1-SNAPSHOT'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+ext {
+    grpcVersion = '1.61.1'
+    protobufVersion = '3.25.6'
+    grpcSpringBootStarterVersion = '3.1.0.RELEASE'
+}
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'com.fasterxml.jackson.module:jackson-module-kotlin'
+    implementation 'org.jetbrains.kotlin:kotlin-reflect'
+    // gRPC Server dependencies (using grpc-spring-boot-starter)
+    implementation "net.devh:grpc-server-spring-boot-starter:${grpcSpringBootStarterVersion}"
+    implementation "io.grpc:grpc-protobuf:${grpcVersion}"
+    implementation "io.grpc:grpc-stub:${grpcVersion}"
+    implementation "io.grpc:grpc-kotlin-stub:1.4.1" // Check latest
+
+    // Protobuf Kotlin runtime
+    implementation "com.google.protobuf:protobuf-kotlin:${protobufVersion}"
+
+    // For @PostConstruct / @PreDestroy if needed later
+    implementation 'jakarta.annotation:jakarta.annotation-api:2.1.1'
+
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3'
+
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+    annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.jetbrains.kotlin:kotlin-test-junit5'
+    // Add gRPC testing and client starter for tests
+    testImplementation "io.grpc:grpc-testing:${grpcVersion}"
+    testImplementation "net.devh:grpc-client-spring-boot-starter:${grpcSpringBootStarterVersion}"
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+protobuf {
+    protoc {
+        artifact = "com.google.protobuf:protoc:${protobufVersion}"
+    }
+    plugins {
+        grpc {
+            artifact = "io.grpc:protoc-gen-grpc-java:${grpcVersion}"
+        }
+        grpckt { // Add the grpc-kotlin plugin
+            artifact = "io.grpc:protoc-gen-grpc-kotlin:1.4.1:jdk8@jar" // Check version! jdk8 classifier for coroutine support
+        }
+    }
+    generateProtoTasks {
+        all().each { task ->
+            task.plugins {
+                grpc {}
+                grpckt {} // Add the Kotlin plugin
+            }
+            task.builtins {
+                kotlin {} // Generate Kotlin code alongside Java
+            }
+        }
+    }
+}
+
+// Ensure generated sources are added to the source set
+sourceSets {
+    main {
+        proto {
+            srcDirs 'src/main/proto' // Location of your .proto files
+        }
+        kotlin {
+            // Include generated Kotlin code
+            srcDirs 'build/generated/source/proto/main/kotlin'
+            srcDirs 'build/generated/source/proto/main/grpckt'
+        }
+//        java {
+//            // Include generated Java code (gRPC base classes)
+//            srcDirs 'build/generated/source/proto/main/java'
+//            srcDirs 'build/generated/source/proto/main/grpc'
+//        }
+    }
+}
+
+// Task to help identify what's happening with protobuf generation
+tasks.register('showProtoPaths') {
+    doLast {
+        println "Proto source directory exists: ${file('src/main/proto').exists()}"
+        println "Proto source directory contents: ${file('src/main/proto').listFiles()}"
+        println "Generated output directory: ${file('build/generated/source/proto')}"
+    }
+}
+tasks.named('compileKotlin') {
+    dependsOn 'showProtoPaths' // Ensure this task runs before compiling Kotlin
+}
+
+// Add this to your build.gradle
+tasks.withType(Copy).configureEach {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+
+kotlin {
+    compilerOptions {
+        freeCompilerArgs.addAll '-Xjsr305=strict'
+    }
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
+
+apply plugin: 'org.jetbrains.kotlin.plugin.spring'
