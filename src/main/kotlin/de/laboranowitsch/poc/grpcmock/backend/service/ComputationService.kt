@@ -29,18 +29,14 @@ class ComputationService(private val jobRepository: JobRepository) : LoggingAwar
      * @param inputItems The list of input items
      * @return A validation result containing a status and optional error message
      */
-    fun validateRequest(jobId: String, inputItems: List<InputParamItem>): ValidationResult {
-        if (jobId.isBlank()) {
-            logger.error("Request received without job_id.")
-            return ValidationResult(false, "job_id is required")
-        }
-
-        if (inputItems.size > 1000) {
-            logger.error("[{}] Received {} items, exceeding limit of 1000.", jobId, inputItems.size)
-            return ValidationResult(false, "Exceeded maximum input item limit of 1000")
-        }
-
-        return ValidationResult(true)
+    fun validateRequest(jobId: String, inputItems: List<InputParamItem>): ValidationResult = when {
+        jobId.isBlank() -> ValidationResult(false, "job_id is required")
+            .also { logger.error("[{}] Validation failed: {}", jobId, it.errorMessage) }
+        inputItems.size > 1000 -> ValidationResult(
+            false,
+            "Exceeded maximum input item limit of 1000",
+        ).also { logger.error("[{}] Received {} items, exceeding limit of 1000.", jobId, inputItems.size) }
+        else -> ValidationResult(true)
     }
 
     /**
@@ -54,9 +50,11 @@ class ComputationService(private val jobRepository: JobRepository) : LoggingAwar
         logger.info("[{}] Processing calculation with {} items.", jobId, inputItems.size)
 
         // Initialize job data
-        jobRepository.updateJobStatus(jobId, GrpcStatus.ACCEPTED)
-        jobRepository.clearJobResults(jobId)
-        jobRepository.storeJobInputs(jobId, inputItems.map { it.value })
+        with(jobRepository) {
+            updateJobStatus(jobId, GrpcStatus.ACCEPTED)
+            clearJobResults(jobId)
+            storeJobInputs(jobId, inputItems.map { it.value })
+        }
 
         // Emit ACCEPTED status
         emit(createStatusResponse(jobId, GrpcStatus.ACCEPTED))
@@ -151,16 +149,18 @@ class ComputationService(private val jobRepository: JobRepository) : LoggingAwar
      * @param message An optional message
      * @return A calculation response with the status update
      */
-    fun createStatusResponse(jobId: String, status: GrpcStatus, message: String? = null): CalculationResponse {
-        val statusBuilder = CalculationStatus.newBuilder().setStatus(status)
-        if (message != null) {
-            statusBuilder.message = message
-        }
-        return CalculationResponse.newBuilder()
+    fun createStatusResponse(
+        jobId: String,
+        status: GrpcStatus,
+        message: String? = null,
+    ): CalculationResponse =
+        CalculationResponse.newBuilder()
             .setJobId(jobId)
-            .setStatusUpdate(statusBuilder)
-            .build()
-    }
+            .setStatusUpdate(
+                CalculationStatus.newBuilder()
+                    .setStatus(status)
+                    .apply { message?.let { this.message = it } }
+            ).build()
 
     /**
      * Represents the result of validating a request.
