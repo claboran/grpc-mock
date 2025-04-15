@@ -38,9 +38,7 @@ class JobRepository : LoggingAware {
      * @param jobId The ID of the job
      * @return The current status, or null if the job doesn't exist
      */
-    fun getJobStatus(jobId: String): GrpcStatus? {
-        return jobStatuses[jobId]
-    }
+    fun getJobStatus(jobId: String): GrpcStatus? = jobStatuses[jobId]
 
     /**
      * Stores the input values for a job.
@@ -59,9 +57,7 @@ class JobRepository : LoggingAware {
      * @param jobId The ID of the job
      * @return The input values, or null if the job doesn't exist
      */
-    fun getJobInputs(jobId: String): List<String>? {
-        return jobInputs[jobId]
-    }
+    fun getJobInputs(jobId: String): List<String>? = jobInputs[jobId]
 
     /**
      * Stores the results for a job.
@@ -80,9 +76,7 @@ class JobRepository : LoggingAware {
      * @param jobId The ID of the job
      * @return The result values, or null if the job doesn't exist
      */
-    fun getJobResults(jobId: String): List<String>? {
-        return jobResults[jobId]
-    }
+    fun getJobResults(jobId: String): List<String>? = jobResults[jobId]
 
     /**
      * Clears the results for a job.
