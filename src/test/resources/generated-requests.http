@@ -1,0 +1,17 @@
+###
+GRPC localhost:9090/computation.ComputationService/ProcessCalculation
+
+{
+  "job_id": "your-unique-job-id-123",
+  "input_items": [
+    {
+      "value": "First input parameter value"
+    },
+    {
+      "value": "Second input value"
+    },
+    {
+      "value": "Another item for processing"
+    }
+  ]
+}
