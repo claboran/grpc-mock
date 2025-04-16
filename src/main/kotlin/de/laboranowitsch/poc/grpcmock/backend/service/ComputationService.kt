@@ -93,11 +93,10 @@ class ComputationService(private val jobRepository: JobRepository) : LoggingAwar
      * @param jobId The ID of the job
      * @return A list of result strings
      */
-    private fun generateResults(jobId: String): List<String> {
-        return jobRepository.getJobInputs(jobId)?.mapIndexed { index, input -> 
-            "Processed: '${input}' (#${index + 1})" 
+    private fun generateResults(jobId: String): List<String> =
+        jobRepository.getJobInputs(jobId)?.mapIndexed { index, input ->
+            "Processed: '${input}' (#${index + 1})"
         } ?: listOf()
-    }
 
     /**
      * Streams results to the client.
