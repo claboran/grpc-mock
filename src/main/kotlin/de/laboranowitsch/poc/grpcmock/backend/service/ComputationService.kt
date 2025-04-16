@@ -109,7 +109,7 @@ class ComputationService(private val jobRepository: JobRepository) : LoggingAwar
     private suspend fun streamResults(
         jobId: String, 
         results: List<String>, 
-        emitter: kotlinx.coroutines.flow.FlowCollector<CalculationResponse>
+        emitter: kotlinx.coroutines.flow.FlowCollector<CalculationResponse>,
     ) {
         logger.info("[{}] Starting to stream results...", jobId)
         results.chunked(10).forEach { chunkValues ->
@@ -134,7 +134,7 @@ class ComputationService(private val jobRepository: JobRepository) : LoggingAwar
     private suspend fun handleProcessingError(
         jobId: String, 
         exception: Exception, 
-        emitter: kotlinx.coroutines.flow.FlowCollector<CalculationResponse>
+        emitter: kotlinx.coroutines.flow.FlowCollector<CalculationResponse>,
     ) {
         logger.error("[{}] Error during calculation or streaming:", jobId, exception)
         jobRepository.updateJobStatus(jobId, GrpcStatus.FAILED)
