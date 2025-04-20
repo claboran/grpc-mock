@@ -26,37 +26,39 @@ repositories {
 }
 
 ext {
-    grpcVersion = '1.61.1'
+    grpcVersion = '1.63.0'
     protobufVersion = '3.25.6'
     grpcSpringBootStarterVersion = '3.1.0.RELEASE'
+    grpcKotlinStubVersion = '1.4.1'
 }
 
 dependencies {
-    implementation 'org.springframework.boot:spring-boot-starter-web'
-    implementation 'com.fasterxml.jackson.module:jackson-module-kotlin'
-    implementation 'org.jetbrains.kotlin:kotlin-reflect'
+    implementation "org.springframework.boot:spring-boot-starter-web"
+    implementation "com.fasterxml.jackson.module:jackson-module-kotlin"
+    implementation "org.jetbrains.kotlin:kotlin-reflect"
     // gRPC Server dependencies (using grpc-spring-boot-starter)
     implementation "net.devh:grpc-server-spring-boot-starter:${grpcSpringBootStarterVersion}"
     implementation "io.grpc:grpc-protobuf:${grpcVersion}"
     implementation "io.grpc:grpc-stub:${grpcVersion}"
-    implementation "io.grpc:grpc-kotlin-stub:1.4.1" // Check latest
+    implementation "io.grpc:grpc-kotlin-stub:${grpcKotlinStubVersion}"
 
     // Protobuf Kotlin runtime
     implementation "com.google.protobuf:protobuf-kotlin:${protobufVersion}"
 
     // For @PostConstruct / @PreDestroy if needed later
-    implementation 'jakarta.annotation:jakarta.annotation-api:3.0.0'
+    implementation "jakarta.annotation:jakarta.annotation-api:3.0.0"
 
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2'
+    // Kotlin Coroutines support
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2"
 
-    developmentOnly 'org.springframework.boot:spring-boot-devtools'
-    annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    testImplementation 'org.jetbrains.kotlin:kotlin-test-junit5'
+    developmentOnly "org.springframework.boot:spring-boot-devtools"
+    annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
+    testImplementation "org.springframework.boot:spring-boot-starter-test"
+    testImplementation "org.jetbrains.kotlin:kotlin-test-junit5"
     // Add gRPC testing and client starter for tests
     testImplementation "io.grpc:grpc-testing:${grpcVersion}"
     testImplementation "net.devh:grpc-client-spring-boot-starter:${grpcSpringBootStarterVersion}"
-    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    testRuntimeOnly "org.junit.platform:junit-platform-launcher"
 }
 
 protobuf {
@@ -68,7 +70,7 @@ protobuf {
             artifact = "io.grpc:protoc-gen-grpc-java:${grpcVersion}"
         }
         grpckt { // Add the grpc-kotlin plugin
-            artifact = "io.grpc:protoc-gen-grpc-kotlin:1.4.1:jdk8@jar" // Check version! jdk8 classifier for coroutine support
+            artifact = "io.grpc:protoc-gen-grpc-kotlin:${grpcKotlinStubVersion}:jdk8@jar" // jdk8 classifier for coroutine support
         }
     }
     generateProtoTasks {
@@ -95,11 +97,7 @@ sourceSets {
             srcDir "build/generated/source/proto/main/kotlin"
             srcDir "build/generated/source/proto/main/grpckt"
         }
-//        java {
-//            // Include generated Java code (gRPC base classes)
-//            srcDirs 'build/generated/source/proto/main/java'
-//            srcDirs 'build/generated/source/proto/main/grpc'
-//        }
+        // java has been removed
     }
 }
 

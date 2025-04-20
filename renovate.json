@@ -2,5 +2,11 @@
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
     "config:recommended"
+  ],
+  "packageRules": [
+    {
+      "matchPackageNames": ["io.grpc:grpc-protobuf", "io.grpc:grpc-stub", "io.grpc:grpc-testing"],
+      "allowedVersions": "<=1.63.0"
+    }
   ]
 }
